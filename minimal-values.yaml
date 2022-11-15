@@ -1,0 +1,50 @@
+extra:
+  broker: false
+  brokerSts: true
+  pulsarSQL: true
+  proxy: false
+  wsproxy: false
+  bastion: false
+
+pulsarSQL:
+  server:
+    workers: 1
+  service:
+    type: ClusterIP
+
+zookeeper:
+  replicaCount: 1
+
+bookkeeper:
+  replicaCount: 1
+
+broker:
+  component: "broker" # this has to match brokerSts naming due to a bug
+  replicaCount: 0
+
+brokerSts:
+  component: "broker" # this has to match broker naming due to a bug
+  replicaCount: 1
+  functionsWorkerEnabled: true # to overcome the need for functions working
+  ledger: # the default assumes 2 bookies but this chart only deploys 1
+    defaultEnsembleSize: 1
+    defaultAckQuorum: 1
+    defaultWriteQuorum: 1
+
+image:
+  brokerSts:
+    repository: datastax/lunastreaming-all #because we want connectors too
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  zookeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  bookkeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  pulsarSQL:
+    repository: datastax/lunastreaming
+    tag: 2.10_2.4
+    pullPolicy: IfNotPresent
