@@ -1,0 +1,6 @@
+POST http://localhost:8090/v1/statement  HTTP/1.1
+content-type: application/json
+X-Presto-User: ddieruf
+
+show tables in pulsar."public/default"
+
