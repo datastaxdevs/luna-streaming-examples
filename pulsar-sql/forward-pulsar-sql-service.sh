@@ -1,0 +1,1 @@
+kubectl port-forward -n datastax-pulsar service/pulsar-sql 8090:8090

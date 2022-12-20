@@ -1,0 +1,65 @@
+extra:
+  broker: false
+  brokerSts: true
+  pulsarBeam: true
+  proxy: true
+  wsproxy: false
+  bastion: false
+
+zookeeper:
+  replicaCount: 1
+
+bookkeeper:
+  replicaCount: 1
+
+broker:
+  component: "broker" # this has to match brokerSts naming
+  replicaCount: 0
+
+brokerSts:
+  component: "broker" # this has to match broker naming
+  replicaCount: 1
+  functionsWorkerEnabled: true # to overcome the need for functions working
+  ledger: # the default assumes 2 bookies but this chart only deploys 1
+    defaultEnsembleSize: 1
+    defaultAckQuorum: 1
+    defaultWriteQuorum: 1
+
+# this is a legacy value that the beam sub-chart uses
+tokenServer:
+  allowedRoles: superuser,admin,websocket,proxy
+
+proxy:
+  component: "proxy"
+  replicaCount: 1
+  service:
+    ports:
+      - name: "pulsarbeam"
+        port: 8085
+        protocol: TCP
+
+pulsarBeam:
+  component: "pulsarbeam"
+  replicaCount: 1
+
+image:
+  proxy:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  brokerSts:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  zookeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  bookkeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  pulsarBeam:
+    repository: kesque/pulsar-beam
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent

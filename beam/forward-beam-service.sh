@@ -1,0 +1,1 @@
+kubectl port-forward -n datastax-pulsar service/pulsar-proxy 8085:8085

@@ -1,0 +1,1 @@
+kubectl port-forward -n datastax-pulsar service/pulsar-broker 8080:8080
