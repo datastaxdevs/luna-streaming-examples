@@ -1,6 +1,9 @@
-GET http://127.0.0.1:8085/v2/topic
+# Produce message
+POST http://127.0.0.1:8085/v2/firehose/persistent/public/default/my-beam-topic
 
-{
-  "PulsarURL": "string",
-  "TopicFullName": "string"
-}
+Hi there
+
+###
+
+# Consume message
+GET http://127.0.0.1:8085/v2/poll/persistent/public/default/my-beam-topic?SubscriptionType=shared&SubscriptionInitialPosition=earliest&SubscriptionName=my-subscription2

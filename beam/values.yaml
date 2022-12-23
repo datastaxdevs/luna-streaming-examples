@@ -37,6 +37,12 @@ proxy:
       - name: "pulsarbeam"
         port: 8085
         protocol: TCP
+      - name: "http"
+        port: 8080
+        protocol: TCP
+      - name: "pulsar"
+        port: 6650
+        protocol: TCP
 
 pulsarBeam:
   component: "pulsarbeam"
@@ -61,5 +67,5 @@ image:
     tag: 2.10_2.4
   pulsarBeam:
     repository: kesque/pulsar-beam
-    tag: "1.0.0"
     pullPolicy: IfNotPresent
+    tag: "1.0.0"
