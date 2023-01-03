@@ -13,5 +13,5 @@ helm install \
 # end::helm-install[]
 
 # tag::wait-for-broker[]
-kubectl -n datastax-pulsar wait --for=condition=Ready pod/pulsar-broker-0
+kubectl -n datastax-pulsar wait --for=condition=Ready pod/pulsar-broker-0 --timeout=120s
 # end::wait-for-broker[]
