@@ -5,7 +5,7 @@ beamUrl = "http://127.0.0.1:8085";
 
 tenantName = "public";
 namespace = "default";
-topicName = "my-beam-topic2";
+topicName = "my-beam-topic";
 
 topic = "persistent://{0}/{1}/{2}".format(tenantName, namespace, topicName)
 
