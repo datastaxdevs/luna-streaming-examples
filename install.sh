@@ -6,7 +6,7 @@ helm repo add datastax-pulsar https://datastax.github.io/pulsar-helm-chart
 helm install \
   --namespace datastax-pulsar \
   --create-namespace \
-  --values ${VALUES_URL} \
+  --values $VALUES_URL \
   --version 3.0.4 \
   my-pulsar-cluster \
   datastax-pulsar/pulsar
