@@ -1,0 +1,74 @@
+extra:
+  broker: false
+  brokerSts: true
+  proxy: true
+  wsproxy: false
+  bastion: false
+
+zookeeper:
+  replicaCount: 1
+
+bookkeeper:
+  replicaCount: 1
+
+broker:
+  component: "broker" # this has to match brokerSts naming
+  replicaCount: 0
+
+brokerSts:
+  component: "broker" # this has to match broker naming
+  replicaCount: 1
+  functionsWorkerEnabled: true # to overcome the need for functions working
+  ledger: # the default assumes 2 bookies but this chart only deploys 1
+    defaultEnsembleSize: 1
+    defaultAckQuorum: 1
+    defaultWriteQuorum: 1
+  service:
+    ports:
+      - name: http
+        port: 8080
+      - name: pulsar
+        port: 6650
+
+proxy:
+  component: "proxy"
+  replicaCount: 1
+  service:
+    ports:
+      - name: "http"
+        port: 8080
+        protocol: TCP
+      - name: "pulsar"
+        port: 6650
+        protocol: TCP
+  configData:
+    PULSAR_PREFIX_amqpListeners: "amqp://0.0.0.0:5672"
+  extensions:
+    enabled: true
+    extensions: "rabbitmq"
+    containerPorts:
+      - name: amqp
+        containerPort: 5672
+    servicePorts:
+      - name: amqp
+        port: 5672
+        protocol: TCP
+        targetPort: amqp
+
+image:
+  proxy:
+    repository: datastax/lunastreaming-all # so we get the starlight for rabbitmq extension
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  brokerSts:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  zookeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  bookkeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
