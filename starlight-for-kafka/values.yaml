@@ -1,0 +1,111 @@
+extra:
+  broker: false
+  brokerSts: true
+  proxy: true
+  wsproxy: false
+  bastion: false
+
+zookeeper:
+  replicaCount: 1
+
+bookkeeper:
+  replicaCount: 1
+
+broker:
+  component: "broker" # this has to match brokerSts naming
+  replicaCount: 0
+
+brokerSts:
+  component: "broker" # this has to match broker naming
+  replicaCount: 1
+  functionsWorkerEnabled: true # to overcome the need for functions working
+  ledger: # the default assumes 2 bookies but this chart only deploys 1
+    defaultEnsembleSize: 1
+    defaultAckQuorum: 1
+    defaultWriteQuorum: 1
+  service:
+    ports:
+      - name: http
+        port: 8080
+      - name: pulsar
+        port: 6650
+      - name: kafkaplaintext
+        port: 9092
+      - name: kafkaschemareg
+        port: 8001
+  configData:
+    PULSAR_PREFIX_protocolHandlerDirectory: "./protocols"
+    PULSAR_PREFIX_messagingProtocols: "kafka"
+    PULSAR_PREFIX_brokerDeleteInactiveTopicsEnabled: "false"
+    PULSAR_PREFIX_saslAllowedMechanisms: PLAIN
+    PULSAR_PREFIX_brokerEntryMetadataInterceptors: "org.apache.pulsar.common.intercept.AppendIndexMetadataInterceptor,org.apache.pulsar.common.intercept.AppendBrokerTimestampMetadataInterceptor"
+    PULSAR_PREFIX_kopSchemaRegistryEnable: "true"
+    PULSAR_PREFIX_allowAutoTopicCreationType: "partitioned"
+    PULSAR_PREFIX_kafkaListeners: "SASL_PLAINTEXT://0.0.0.0:9092"
+    PULSAR_PREFIX_kafkaAdvertisedListeners: "SASL_PLAINTEXT://advertisedAddress:9092"
+    PULSAR_PREFIX_kafkaTransactionCoordinatorEnabled: "true"
+
+proxy:
+  component: "proxy"
+  replicaCount: 1
+  service:
+    ports:
+      - name: "s4k"
+        port: 9095
+        protocol: TCP
+      - name: "http"
+        port: 8080
+        protocol: TCP
+      - name: "pulsar"
+        port: 6650
+        protocol: TCP
+  configData:
+    PULSAR_PREFIX_kafkaListeners: "SASL_PLAINTEXT://0.0.0.0:9092"
+    # here you have to customize the advertised name if you want to access
+    # Kafka from outside the kube
+    # Drop the SASL_PLAINTEXT endpoint if you want to allow only TLS (here and above)
+    # The Proxy uses the same TLS certificate configured for the Pulsar protocol
+    #    PULSAR_PREFIX_kafkaAdvertisedListeners: "SASL_PLAINTEXT://pulsar-proxy:9092,SASL_SSL://pulsar-proxy:9093"
+    # if you use port forwarding to localhost then you have to set 'localhost'
+    PULSAR_PREFIX_kafkaAdvertisedListeners: "SASL_PLAINTEXT://localhost:9092"
+    PULSAR_PREFIX_saslAllowedMechanisms: PLAIN
+    PULSAR_PREFIX_kafkaProxySuperUserRole: superuser
+    PULSAR_PREFIX_kopSchemaRegistryProxyEnableTls: "true"
+    PULSAR_PREFIX_kopSchemaRegistryEnable: "true"
+    PULSAR_PREFIX_kopSchemaRegistryProxyPort: "8081"
+    PULSAR_PREFIX_kafkaTransactionCoordinatorEnabled: "true"
+  extensions:
+    enabled: true
+    extensions: "kafka"
+    containerPorts:
+      - name: kafkaplaintext
+        containerPort: 9092
+      - name: kafkaschemareg
+        containerPort: 8081
+    servicePorts:
+      - name: kafkaplaintext
+        port: 9092
+        protocol: TCP
+        targetPort: kafkaplaintext
+      - name: kafkaschemareg
+        port: 8081
+        protocol: TCP
+        targetPort: kafkaschemareg
+
+image:
+  proxy:
+    repository: datastax/lunastreaming-all # so we get the starlight for kafka extension
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  brokerSts:
+    repository: datastax/lunastreaming-all # so we get the starlight for kafka extension
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  zookeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
+  bookkeeper:
+    repository: datastax/lunastreaming
+    pullPolicy: IfNotPresent
+    tag: 2.10_2.4
